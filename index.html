@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>보안 점검 당직표</title>
+  <style>
+    :root { color-scheme: light; font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif; color: #193248; background: #f3f7f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
+    .shell { width: min(1050px, calc(100% - 36px)); margin: 0 auto; padding: 42px 0 80px; }
+    .eyebrow { color: #087d77; font-size: 12px; font-weight: 800; letter-spacing: .14em; }
+    h1 { margin: 10px 0; font-size: clamp(30px, 5vw, 44px); letter-spacing: -.06em; }
+    .intro { margin: 0 0 24px; color: #586a7b; line-height: 1.7; }
+    .steps { display: flex; gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; }
+    .steps li { flex: 1; padding: 10px; border-radius: 10px; color: #657d89; background: #e5eeee; font-size: 13px; font-weight: 750; text-align: center; }
+    .steps li.active { color: #fff; background: #087d77; }
+    .panel { padding: 27px; border: 1px solid #dce7e8; border-radius: 20px; background: #fff; box-shadow: 0 14px 38px #2944550b; }
+    h2 { margin: 0 0 8px; font-size: 20px; letter-spacing: -.035em; }
+    .help { margin: 0 0 23px; color: #647787; font-size: 13px; line-height: 1.7; }
+    .inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .field { display: grid; gap: 8px; color: #3d5669; font-size: 13px; font-weight: 700; }
+    .field input { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #cbdadb; border-radius: 10px; color: #193248; background: #fff; }
+    input:focus-visible, button:focus-visible { outline: 3px solid #3dc8b8; outline-offset: 2px; }
+    .section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 30px 0 12px; }
+    .section-title h3 { margin: 0; font-size: 16px; }
+    .section-title span { color: #718494; font-size: 12px; }
+    .people { display: grid; gap: 10px; }
+    .person { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border: 1px solid #e1e9ea; border-radius: 13px; background: #fbfcfc; }
+    .number { display: grid; flex: 0 0 30px; width: 30px; height: 30px; place-items: center; border-radius: 9px; color: #087d77; background: #dcf5ef; font-size: 12px; font-weight: 800; }
+    .person label { display: flex; flex: 1; align-items: center; gap: 12px; color: #4a6070; font-size: 12px; font-weight: 750; }
+    .person input { width: min(100%, 310px); min-height: 40px; padding: 8px 10px; border: 1px solid #cbdadb; border-radius: 9px; background: #fff; }
+    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 23px; }
+    .actions button, .whole-day { min-height: 46px; padding: 9px 18px; border: 1px solid #bdd6d4; border-radius: 10px; color: #176e69; background: #fff; font-weight: 750; }
+    .actions .primary { color: #fff; border-color: #087d77; background: #087d77; }
+    .actions .primary:hover { background: #066e69; }
+    .message { min-height: 20px; margin: 14px 0 0; color: #a34133; font-size: 13px; font-weight: 700; line-height: 1.6; }
+    .message.ok { color: #087d77; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 20px; }
+    .tabs button { padding: 10px 14px; border: 1px solid #d3e4e2; border-radius: 10px; color: #36566a; background: #f6faf9; font-weight: 750; }
+    .tabs button[aria-pressed="true"] { border-color: #087d77; color: #fff; background: #087d77; }
+    .calendar-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 270px); gap: 20px; align-items: start; }
+    .calendars { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 315px), 1fr)); gap: 18px; }
+    .month { padding: 14px; border: 1px solid #e0ebeb; border-radius: 14px; background: #fafcfc; }
+    .month h3 { margin: 0 0 14px; font-size: 15px; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+    .weekday { padding: 5px 0; color: #6e8491; font-size: 11px; text-align: center; }
+    .calendar-day { display: grid; min-height: 62px; align-content: center; gap: 2px; padding: 4px 2px; border: 1px solid #dce9e8; border-radius: 8px; color: #193248; background: #fff; text-align: center; }
+    .calendar-day strong { font-size: 15px; }
+    .calendar-day small { color: #708595; font-size: 10px; }
+    .calendar-day.partial { background: #fff4e5; border-color: #e9d3aa; }
+    .calendar-day.blocked { background: #fbe9e5; border-color: #efccc2; }
+    .calendar-day.partial small, .calendar-day.blocked small { color: #9c4a30; }
+    .calendar-day[aria-pressed="true"] { outline: 3px solid #087d77; outline-offset: -3px; }
+    .day-panel { min-height: 180px; padding: 18px; border: 1px solid #dce7e8; border-radius: 14px; background: #f7fbfa; }
+    .day-panel h3 { margin: 0 0 12px; font-size: 17px; }
+    .day-panel p { color: #647787; font-size: 12px; line-height: 1.6; }
+    .time-options { display: grid; gap: 9px; margin: 18px 0; }
+    .time-options label { display: flex; align-items: center; gap: 8px; padding: 9px; border: 1px solid #e0eaea; border-radius: 8px; background: #fff; cursor: pointer; }
+    .time-options input { width: 17px; height: 17px; accent-color: #b55440; }
+    .whole-day { width: 100%; font-size: 13px; }
+    .stats { display: flex; flex-wrap: wrap; gap: 9px; margin: 16px 0; }
+    .stats span { padding: 9px 12px; border-radius: 9px; color: #25635d; background: #e7f6f2; font-size: 13px; font-weight: 750; }
+    .notice { margin: 0 0 18px; color: #536879; font-size: 13px; line-height: 1.6; }
+    .notice.warning { color: #ad6520; }
+    .assignments { display: grid; gap: 8px; padding: 0; list-style: none; }
+    .assignments li { display: flex; justify-content: space-between; gap: 9px; padding: 10px; border-radius: 8px; background: #fff; font-size: 13px; }
+    .assignments strong { color: #087d77; }
+    .counts-title { margin-top: 28px; }
+    .counts { width: min(380px, 100%); border-collapse: collapse; text-align: left; font-size: 14px; }
+    .counts th, .counts td { padding: 12px 10px; border-bottom: 1px solid #e4ebec; }
+    .counts th { color: #456273; background: #f4f8f8; font-size: 12px; }
+    .footnote { margin: 20px 0 0; color: #718494; font-size: 12px; }
+    @media (max-width: 730px) {
+      .calendar-layout { grid-template-columns: 1fr; }
+      .calendars { grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); }
+    }
+    @media (max-width: 650px) {
+      .shell { padding-top: 26px; }
+      .panel { padding: 18px; }
+      .inputs { grid-template-columns: 1fr; }
+      .person { gap: 9px; padding: 12px; }
+      .person label { display: grid; gap: 5px; }
+      .steps li { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="eyebrow">SECURITY CHECK · DUTY PLANNER</div>
+    <h1>보안 점검 당직표</h1>
+    <p class="intro">참석자와 기간을 입력하고, 캘린더에서 불가능한 시간대를 표시하세요. 매일 08:00 · 17:00 · 22:00을 가능한 사람에게 최대한 균등하게 배정합니다.</p>
+    <ol class="steps" aria-label="진행 단계">
+      <li data-step="1" class="active">1. 참석자·기간</li>
+      <li data-step="2">2. 불가능 시간</li>
+      <li data-step="3">3. 당직표 결과</li>
+    </ol>
+
+    <form id="planner" novalidate>
+      <section class="panel" id="setup" aria-labelledby="setupTitle">
+        <h2 id="setupTitle">1단계 · 참석자와 기간</h2>
+        <p class="help">아래 이름은 가짜 예시입니다. 실제 참석자 이름과 점검 기간으로 바꿔 주세요.</p>
+        <div class="inputs">
+          <label class="field">참석자 인원 수 (1~20명)
+            <input id="personCount" type="number" min="1" max="20" step="1" value="5">
+          </label>
+          <label class="field">시작 날짜
+            <input id="startDate" type="date" value="2026-10-07">
+          </label>
+          <label class="field">종료 날짜 (최대 31일)
+            <input id="endDate" type="date" value="2026-10-19">
+          </label>
+        </div>
+        <div class="section-title"><h3>참석자 이름</h3><span>인원 수만큼 입력</span></div>
+        <div class="people" id="people"></div>
+        <div class="actions"><button id="toAvailability" class="primary" type="button">다음 · 불가능 시간 선택</button></div>
+        <p class="message" id="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel" id="availability" aria-labelledby="availabilityTitle" hidden>
+        <h2 id="availabilityTitle">2단계 · 불가능한 날짜와 시간</h2>
+        <p class="help">참석자를 고른 뒤 날짜를 클릭하세요. 그날 불가능한 08시·17시·22시를 모두 체크하면 됩니다. 체크하지 않은 회차는 가능으로 취급합니다.</p>
+        <div class="tabs" id="personTabs" aria-label="참석자 선택"></div>
+        <div class="calendar-layout">
+          <div class="calendars" id="availabilityCalendar" aria-label="불가능한 날짜 선택"></div>
+          <div class="day-panel" aria-live="polite">
+            <div id="dayEditor"></div>
+            <button id="blockWholeDay" class="whole-day" type="button">하루 전체 불가</button>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="backToSetup" type="button">이전 · 참석자·기간</button>
+          <button class="primary" type="submit">당직표 무작위로 만들기</button>
+        </div>
+        <p class="message" id="availabilityMessage" role="status" aria-live="polite"></p>
+      </section>
+    </form>
+
+    <section class="panel" id="result" aria-labelledby="resultTitle" hidden>
+      <h2 id="resultTitle">3단계 · 당직표 결과</h2>
+      <p class="help">날짜를 클릭하면 해당 날 3개 시간대의 담당자를 확인할 수 있습니다.</p>
+      <div class="stats" id="stats"></div>
+      <p class="notice" id="notice"></p>
+      <div class="calendar-layout">
+        <div class="calendars" id="resultCalendar" aria-label="당직 날짜 선택"></div>
+        <div class="day-panel" aria-live="polite">
+          <h3 id="resultDayTitle"></h3>
+          <ul class="assignments" id="dayAssignments"></ul>
+        </div>
+      </div>
+      <h2 class="counts-title">참석자별 횟수</h2>
+      <table class="counts">
+        <thead><tr><th scope="col">참석자</th><th scope="col">배정</th></tr></thead>
+        <tbody id="countBody"></tbody>
+      </table>
+      <div class="actions"><button id="backToAvailability" type="button">이전 · 불가능 시간 수정</button></div>
+      <p class="footnote">결과는 화면에만 표시됩니다. 같은 조건으로 다시 만들면 동률 배정은 달라질 수 있습니다.</p>
+    </section>
+  </main>
+
+  <script src="schedule-core.js"></script>
+  <script>
+    const planner = document.querySelector("#planner");
+    const countInput = document.querySelector("#personCount");
+    const startInput = document.querySelector("#startDate");
+    const endInput = document.querySelector("#endDate");
+    const peopleRoot = document.querySelector("#people");
+    const message = document.querySelector("#message");
+    const availabilityMessage = document.querySelector("#availabilityMessage");
+    const result = document.querySelector("#result");
+    const sampleNames = ["김하린", "박도윤", "이서윤", "최민재", "정지우"];
+    let nextId = 0;
+    const people = sampleNames.map((name) => ({ id: ++nextId, name, excluded: new Set() }));
+    let selectedPersonId = people[0].id;
+    let selectedDay = "";
+    let selectedResultDay = "";
+    let currentSchedule = null;
+
+    function showStage(step) {
+      document.querySelector("#setup").hidden = step !== 1;
+      document.querySelector("#availability").hidden = step !== 2;
+      result.hidden = step !== 3;
+      document.querySelectorAll(".steps li").forEach((item) => {
+        item.className = Number(item.dataset.step) === step ? "active" : "";
+      });
+    }
+
+    function renderPeople() {
+      peopleRoot.replaceChildren();
+      people.forEach((person, index) => {
+        const card = document.createElement("div");
+        card.className = "person";
+        const number = document.createElement("span");
+        number.className = "number";
+        number.textContent = String(index + 1).padStart(2, "0");
+        const label = document.createElement("label");
+        label.textContent = `참석자 ${index + 1}`;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 30;
+        input.placeholder = "이름 입력";
+        input.autocomplete = "off";
+        input.dataset.nameId = person.id;
+        input.value = person.name;
+        label.append(input);
+        card.append(number, label);
+        peopleRoot.append(card);
+      });
+    }
+
+    function validateSetup() {
+      const count = Number(countInput.value);
+      if (!Number.isInteger(count) || count !== people.length || count < 1 || count > 20) {
+        throw new Error("참석자 인원 수를 1~20명으로 확정해 주세요.");
+      }
+      const days = SecuritySchedule.getDays(startInput.value, endInput.value);
+      const names = people.map((person) => person.name.trim());
+      if (names.some((name) => !name) || new Set(names).size !== names.length) {
+        throw new Error("모든 참석자의 서로 다른 이름을 입력해 주세요.");
+      }
+      return days;
+    }
+
+    function renderCalendar(root, days, selected, getStatus) {
+      root.replaceChildren();
+      const months = new Map();
+      days.forEach((day) => {
+        const month = day.date.slice(0, 7);
+        if (!months.has(month)) months.set(month, []);
+        months.get(month).push(day);
+      });
+      months.forEach((monthDays, month) => {
+        const section = document.createElement("section");
+        section.className = "month";
+        const title = document.createElement("h3");
+        title.textContent = `${month.slice(0, 4)}년 ${Number(month.slice(5))}월`;
+        const grid = document.createElement("div");
+        grid.className = "calendar-grid";
+        ["일", "월", "화", "수", "목", "금", "토"].forEach((name) => {
+          const weekday = document.createElement("span");
+          weekday.className = "weekday";
+          weekday.textContent = name;
+          grid.append(weekday);
+        });
+        const offset = new Date(`${monthDays[0].date}T00:00:00Z`).getUTCDay();
+        for (let index = 0; index < offset; index += 1) {
+          grid.append(document.createElement("span"));
+        }
+        monthDays.forEach((day) => {
+          const { style, status } = getStatus(day);
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `calendar-day ${style}`;
+          button.dataset.calendarDate = day.date;
+          button.setAttribute("aria-pressed", String(day.date === selected));
+          button.setAttribute("aria-label", `${day.date} ${status}`);
+          const number = document.createElement("strong");
+          number.textContent = String(Number(day.date.slice(-2)));
+          const caption = document.createElement("small");
+          caption.textContent = status;
+          button.append(number, caption);
+          grid.append(button);
+        });
+        section.append(title, grid);
+        root.append(section);
+      });
+    }
+
+    function currentPerson() {
+      return people.find((person) => person.id === selectedPersonId);
+    }
+
+    function renderDayEditor() {
+      const editor = document.querySelector("#dayEditor");
+      editor.replaceChildren();
+      const title = document.createElement("h3");
+      title.textContent = `${selectedDay} · ${currentPerson().name.trim()}`;
+      const description = document.createElement("p");
+      description.textContent = "불가능한 시간을 여러 개 체크하세요.";
+      const options = document.createElement("div");
+      options.className = "time-options";
+      SecuritySchedule.TIMES.forEach((time) => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.dataset.blockTime = time;
+        input.checked = currentPerson().excluded.has(`${selectedDay}|${time}`);
+        const text = document.createElement("span");
+        text.textContent = `${time} 불가`;
+        label.append(input, text);
+        options.append(label);
+      });
+      editor.append(title, description, options);
+      const allBlocked = SecuritySchedule.TIMES.every((time) => currentPerson().excluded.has(`${selectedDay}|${time}`));
+      document.querySelector("#blockWholeDay").textContent = allBlocked ? "하루 전체 다시 가능" : "하루 전체 불가";
+    }
+
+    function renderAvailability() {
+      const days = SecuritySchedule.getDays(startInput.value, endInput.value);
+      if (!days.some((day) => day.date === selectedDay)) selectedDay = days[0].date;
+      if (!currentPerson()) selectedPersonId = people[0].id;
+      const tabs = document.querySelector("#personTabs");
+      tabs.replaceChildren();
+      people.forEach((person) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.personChoice = person.id;
+        button.setAttribute("aria-pressed", String(person.id === selectedPersonId));
+        const blocked = days.reduce((total, day) => total + SecuritySchedule.TIMES.filter(
+          (time) => person.excluded.has(`${day.date}|${time}`)
+        ).length, 0);
+        button.textContent = `${person.name.trim()} · 불가 ${blocked}회`;
+        tabs.append(button);
+      });
+      renderCalendar(document.querySelector("#availabilityCalendar"), days, selectedDay, (day) => {
+        const count = SecuritySchedule.TIMES.filter(
+          (time) => currentPerson().excluded.has(`${day.date}|${time}`)
+        ).length;
+        return {
+          style: count === 3 ? "blocked" : count ? "partial" : "",
+          status: count ? `불가 ${count}/3` : "모두 가능"
+        };
+      });
+      renderDayEditor();
+    }
+
+    function renderResultDay() {
+      const day = currentSchedule.days.find((item) => item.date === selectedResultDay);
+      document.querySelector("#resultDayTitle").textContent = `${day.date} (${day.label.split("(")[1]}`;
+      const list = document.querySelector("#dayAssignments");
+      list.replaceChildren();
+      currentSchedule.entries.filter((entry) => entry.date === selectedResultDay).forEach((entry) => {
+        const item = document.createElement("li");
+        const time = document.createElement("span");
+        const name = document.createElement("strong");
+        time.textContent = entry.time;
+        name.textContent = entry.name;
+        item.append(time, name);
+        list.append(item);
+      });
+    }
+
+    function renderResult(schedule) {
+      currentSchedule = schedule;
+      selectedResultDay = schedule.days[0].date;
+      const stats = document.querySelector("#stats");
+      stats.replaceChildren();
+      [
+        `총 ${schedule.entries.length}회`,
+        `최대 횟수 차이 ${schedule.maxDifference}회`,
+        "가용 조건 위반 0회",
+        `하루 중복 ${schedule.sameDayRepeats}회`
+      ].forEach((text) => {
+        const badge = document.createElement("span");
+        badge.textContent = text;
+        stats.append(badge);
+      });
+      const notice = document.querySelector("#notice");
+      notice.className = schedule.perfectlyBalanced ? "notice" : "notice warning";
+      notice.textContent = schedule.perfectlyBalanced
+        ? "불가능한 회차를 제외하고 배정 횟수를 최대한 균등하게 만들었습니다. 동률은 무작위로 선택합니다."
+        : "가능 시간 제한으로 완전한 횟수 균형은 불가능했습니다. 아래 횟수 차이를 확인해 주세요.";
+      const countBody = document.querySelector("#countBody");
+      countBody.replaceChildren();
+      schedule.counts.forEach(({ name, count }) => {
+        const row = document.createElement("tr");
+        [name, `${count}회`].forEach((value) => {
+          const cell = document.createElement("td");
+          cell.textContent = value;
+          row.append(cell);
+        });
+        countBody.append(row);
+      });
+      renderCalendar(document.querySelector("#resultCalendar"), schedule.days, selectedResultDay,
+        () => ({ style: "", status: "담당자 보기" }));
+      renderResultDay();
+      showStage(3);
+    }
+
+    countInput.addEventListener("change", () => {
+      const count = Number(countInput.value);
+      if (!Number.isInteger(count) || count < 1 || count > 20) {
+        message.textContent = "참석자 인원은 1~20명으로 입력해 주세요.";
+        return;
+      }
+      while (people.length < count) people.push({ id: ++nextId, name: "", excluded: new Set() });
+      people.length = count;
+      message.textContent = "";
+      renderPeople();
+    });
+
+    peopleRoot.addEventListener("input", (event) => {
+      const person = people.find((item) => String(item.id) === event.target.dataset.nameId);
+      if (person) person.name = event.target.value;
+    });
+
+    function advanceSetup() {
+      try {
+        validateSetup();
+        message.textContent = "";
+        selectedPersonId = people[0].id;
+        selectedDay = "";
+        renderAvailability();
+        showStage(2);
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    }
+
+    document.querySelector("#toAvailability").addEventListener("click", advanceSetup);
+    document.querySelector("#backToSetup").addEventListener("click", () => showStage(1));
+    document.querySelector("#backToAvailability").addEventListener("click", () => {
+      renderAvailability();
+      showStage(2);
+    });
+
+    document.querySelector("#personTabs").addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-person-choice]");
+      if (!button) return;
+      selectedPersonId = Number(button.dataset.personChoice);
+      renderAvailability();
+      document.querySelector("#personTabs").children[people.findIndex((person) => person.id === selectedPersonId)].focus();
+    });
+    document.querySelector("#availabilityCalendar").addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-calendar-date]");
+      if (!button) return;
+      selectedDay = button.dataset.calendarDate;
+      renderAvailability();
+      document.querySelector("#dayEditor").querySelector("input").focus();
+    });
+    document.querySelector("#dayEditor").addEventListener("change", (event) => {
+      const time = event.target.dataset.blockTime;
+      if (!SecuritySchedule.TIMES.includes(time)) return;
+      const key = `${selectedDay}|${time}`;
+      if (event.target.checked) currentPerson().excluded.add(key);
+      else currentPerson().excluded.delete(key);
+      renderAvailability();
+      [...document.querySelector("#dayEditor").querySelectorAll("input")]
+        .find((input) => input.dataset.blockTime === time).focus();
+    });
+    document.querySelector("#blockWholeDay").addEventListener("click", () => {
+      const keys = SecuritySchedule.TIMES.map((time) => `${selectedDay}|${time}`);
+      const allBlocked = keys.every((key) => currentPerson().excluded.has(key));
+      keys.forEach((key) => {
+        if (allBlocked) currentPerson().excluded.delete(key);
+        else currentPerson().excluded.add(key);
+      });
+      renderAvailability();
+    });
+    document.querySelector("#resultCalendar").addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-calendar-date]");
+      if (!button) return;
+      selectedResultDay = button.dataset.calendarDate;
+      renderCalendar(document.querySelector("#resultCalendar"), currentSchedule.days, selectedResultDay,
+        () => ({ style: "", status: "담당자 보기" }));
+      renderResultDay();
+      [...document.querySelector("#resultCalendar").querySelectorAll("button[data-calendar-date]")]
+        .find((item) => item.dataset.calendarDate === selectedResultDay).focus();
+    });
+
+    planner.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!document.querySelector("#setup").hidden) {
+        advanceSetup();
+        return;
+      }
+      try {
+        validateSetup();
+        const schedule = SecuritySchedule.makeSchedule({
+          start: startInput.value,
+          end: endInput.value,
+          participants: people.map((person) => ({
+            name: person.name,
+            unavailable: [...person.excluded]
+          }))
+        });
+        availabilityMessage.textContent = "";
+        renderResult(schedule);
+      } catch (error) {
+        availabilityMessage.textContent = error.message;
+      }
+    });
+
+    renderPeople();
+    showStage(1);
+  </script>
+</body>
+</html>
